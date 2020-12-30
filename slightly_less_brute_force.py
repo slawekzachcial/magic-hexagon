@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import itertools
 
 def sum38(it):
