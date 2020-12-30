@@ -26,6 +26,6 @@ if __name__ == '__main__':
     # result = next(filter(isValid, itertools.permutations(numbers)))
     # print(result)
     with mp.Pool(mp.cpu_count()) as pool:
-        result = list(filter(lambda l: len(l) > 0, pool.map(validOrEmpty, itertools.permutations(numbers))))
+        result = list(filter(lambda l: len(l) > 0, pool.imap(validOrEmpty, itertools.permutations(numbers), 10000)))
         for r in result:
             print(r)
