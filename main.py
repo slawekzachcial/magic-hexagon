@@ -1,83 +1,86 @@
 #!/usr/bin/env python3
 
 import itertools
-import multiprocessing as mp
 
-def highlight(s):
-    print('\x1b[6;30;42m' + str(s) + '\x1b[0m')
+HEXAGON_SIDES = 6
 
-def sum38(it):
-    return filter(lambda l: sum(l) == 38, it)
+def isRingBaseCompatible(base, candidate):
+    baseFirstMayOnlyBeLast = not(base[0] in candidate[0:-1])
+    baseLastMayOnlyBeFirst = not(base[-1] in candidate[1:])
+    baseMiddleMustBeNowhere = len(set(candidate) - set(base[1:-1])) == len(candidate)
+    return baseFirstMayOnlyBeLast and baseLastMayOnlyBeFirst and baseMiddleMustBeNowhere
 
-def candidates3(base, it):
-    b0, b1, b2 = base
-    filteredB0 = filter(lambda el: b0 != el[0] and b0 != el[1], it)
-    filteredB1 = filter(lambda el: b1 != el[0] and b1 != el[1] and b1 != el[2], filteredB0)
-    filteredB2 = filter(lambda el: b2 != el[1] and b2 != el[2], filteredB1)
-    return filteredB2
+def isClosingRing(maybeRing):
+    return maybeRing[0][0] == maybeRing[-1][-1]
 
-def nextCandidates3(base, it):
-    return filter(lambda el: base[2] == el[0], it)
+def isNextCandidate(head, candidateSum, candidate):
+    return head[-1] == candidate[0] and sum(candidate) == candidateSum
 
-def collectSuites3(result, candidate, remainingElements, headCandidates):
-    if len(candidate) > 6:
+def collectRings(result, candidate, remaining, remainingSideSums, headCandidates):
+    if len(candidate) > HEXAGON_SIDES:
         return
-    if not(remainingElements) or not(headCandidates):
-        if len(candidate) == 6 and candidate[0][0] == candidate[5][2]:
+    if not(remaining) or not(headCandidates):
+        if len(candidate) == HEXAGON_SIDES and isClosingRing(candidate):
             result += [candidate]
         return
 
     for head in headCandidates:
-        filteredHead = list(candidates3(head, remainingElements))
-        nextHeadCandidates = list(nextCandidates3(head, filteredHead))
-        collectSuites3(result, candidate + [head], filteredHead, nextHeadCandidates)
+        nextHeadSum = remainingSideSums[0] if remainingSideSums else -1
+        nextRemainingSideSums = remainingSideSums[1:] if remainingSideSums else []
 
-def isValid0(l):
-    return sum(l[0:3]) == 38 and sum(l[3:7]) == 38 and sum(l[7:12]) == 38 and sum(l[12:16]) == 38 and sum(l[16:19]) == 38
+        filteredHead = list(filter(lambda x: isRingBaseCompatible(head, x), remaining))
+        nextHeadCandidates = list(filter(lambda x: isNextCandidate(head, nextHeadSum, x), filteredHead))
+        collectRings(result, candidate + [head], filteredHead, nextRemainingSideSums, nextHeadCandidates)
 
-def rotate(it, indices):
-    return list(map(lambda index: it[index], indices))
+def sumsForRing(ring):
+    return list(map(lambda i: ring[i-1][-2] + ring[(i+1) % HEXAGON_SIDES][1], range(HEXAGON_SIDES)))
 
-rotation1 = [2, 6, 11, 1, 5, 10, 15, 0, 4, 9, 14, 18, 3, 8, 13, 17, 7, 12, 16]
-rotation2 = [11, 15, 18, 6, 10, 14, 17, 2, 5, 9, 13, 16, 1, 4, 8, 12, 0, 3, 7]
-
-def isValid(l):
-    return isValid0(l) and isValid0(rotate(l, rotation1)) and isValid0(rotate(l, rotation2))
-
-indicesOuter = [0, 1, 2, 6, 11, 15, 18, 17, 16, 12, 7, 3]
-indicesInner = [4, 5, 8, 9, 10, 13, 14]
-
-def collectResults(len3Candidate):
+def rings(sideSums, candidates):
     result = []
-    candidate = [0] * 19
-
-    outerNumbers = list(itertools.chain.from_iterable(map(lambda l: l[:2], len3Candidate)))
-    # TODO: duplication of numbers = range(1, 20)
-    innerNumbers = set(range(1, 20)) - set(outerNumbers)
-
-    for i in range(len(indicesOuter)):
-        candidate[indicesOuter[i]] = outerNumbers[i]
-
-    for p in map(list, itertools.permutations(innerNumbers)):
-        for i in range(len(innerNumbers)):
-            candidate[indicesInner[i]] = p[i]
-
-        if isValid(candidate):
-            result += candidate
+    collectRings(result, [], candidates, sideSums[1:],
+                 list(filter(lambda l: sum(l) == sideSums[0], candidates)))
 
     return result
 
+def ringToList(ring):
+    return sum(map(lambda l: l[0:-1], ring), [])
+
+def ringIndicesToLinear(ringList):
+    if len(ringList) == 1:
+        return ringList
+    # TODO: there must be a better way to do this!
+    if len(ringList) == 7:
+        return list(map(lambda i: ringList[i], [0,1,5,6,2,4,3]))
+    if len(ringList) == 19:
+        return list(map(lambda i: ringList[i], [0,1,2,11,12,13,3,10,17,18,14,4,9,16,15,5,8,7,6]))
+    return []
 
 if __name__ == '__main__':
-    numbers = range(1, 20)
+    SIDE_SIZE = 3
+    SIDE_SUM = 38
+    NUMBERS = range(1, 20)
 
-    len3 = map(list, itertools.permutations(numbers, 3))
-    len3sum38 = list(sum38(len3))
+    result = []
 
-    len3Candidates = []
-    collectSuites3(len3Candidates, [], len3sum38, len3sum38)
+    outerRingSums = [SIDE_SUM] * HEXAGON_SIDES
 
-    with mp.Pool(mp.cpu_count()) as p:
-        result = list(filter(lambda r: len(r) > 0, p.map(collectResults, len3Candidates)))
-        for r in result:
-            highlight(r)
+    outerRings = rings(outerRingSums,
+                       list(filter(lambda x: sum(x) in outerRingSums,
+                                   map(list, itertools.permutations(NUMBERS, SIDE_SIZE)))))
+
+    for outerRing in outerRings:
+        outerRingNumbers = set(sum(outerRing, []))
+        innerRingNumbers = set(NUMBERS) - outerRingNumbers
+        innerRingSums = list(map(lambda v: SIDE_SUM - v, sumsForRing(outerRing)))
+
+        innerRings = rings(innerRingSums,
+                           list(filter(lambda x: sum(x) in innerRingSums,
+                                       map(list, itertools.permutations(innerRingNumbers, SIDE_SIZE-1)))))
+
+        for innerRing in innerRings:
+            finalNumber = list(innerRingNumbers - set(sum(innerRing, [])))
+
+            result += [ringToList(outerRing) + ringToList(innerRing) + finalNumber]
+
+
+    for r in result: print(ringIndicesToLinear(r))
