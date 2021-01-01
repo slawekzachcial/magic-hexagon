@@ -95,41 +95,6 @@ if __name__ == '__main__':
     outerRingSums = [SIDE_SUM] * HEXAGON_SIDES
     outerRingPossibleNumbers = set(NUMBERS)
 
-    # collectResults(results, [], outerRingSums, outerRingPossibleNumbers, SIDE_SIZE)
-
-    ringL0Sums = [SIDE_SUM] * HEXAGON_SIDES
-    ringL0PossibleNumbers = set(NUMBERS)
-
-    ringsL0 = rings(ringL0Sums,
-                    list(filter(lambda x: sum(x) in ringL0Sums,
-                                map(list, itertools.permutations(ringL0PossibleNumbers, SIDE_SIZE)))))
-
-    for ringL0 in ringsL0:
-        ringL0Numbers = set(sum(ringL0, []))
-        ringL1PossibleNumbers = ringL0PossibleNumbers - ringL0Numbers
-        sumsForRingL0 = sumsForRing(ringL0)
-        ringL1Sums = list(map(lambda i: ringL0Sums[i] - sumsForRingL0[i], range(HEXAGON_SIDES)))
-
-        ringsL1 = rings(ringL1Sums,
-                        list(filter(lambda x: sum(x) in ringL1Sums,
-                                    map(list, itertools.permutations(ringL1PossibleNumbers, SIDE_SIZE-1)))))
-
-        for ringL1 in ringsL1:
-            if SIDE_SIZE == 3:
-                finalNumberL2 = list(ringL1PossibleNumbers - set(sum(ringL1, [])))
-                results += [ringToList(ringL0) + ringToList(ringL1) + finalNumberL2]
-            elif SIDE_SIZE == 4:
-                ringL1Numbers = set(sum(ringL1, []))
-                ringL2PossibleNumbers = ringL1PossibleNumbers - ringL1Numbers
-                sumsForRingL1 = sumsForRing(ringL1)
-                ringL2Sums = list(map(lambda i: ringL1Sums[i] - sumsForRingL1[i], range(HEXAGON_SIDES)))
-
-                ringsL2 = rings(ringL2Sums,
-                                list(filter(lambda x: sum(x) in ringL2Sums,
-                                            map(list, itertools.permutations(ringL2PossibleNumbers, SIDE_SIZE-2)))))
-
-                for ringL2 in ringsL2:
-                    finalNumberL3 = list(ringL2PossibleNumbers - set(sum(ringL2, [])))
-                    results += [ringToList(ringL0) + ringToList(ringL1) + ringToList(ringL2) + finalNumberL3]
+    collectResults(results, [], outerRingSums, outerRingPossibleNumbers, SIDE_SIZE)
 
     for r in results: print(ringIndicesToLinear(r))
