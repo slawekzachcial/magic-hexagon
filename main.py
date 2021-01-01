@@ -33,8 +33,8 @@ def collectRings(result, candidate, remaining, remainingSideSums, headCandidates
         nextHeadCandidates = list(filter(lambda x: isNextCandidate(head, nextHeadSum, x), filteredHead))
         collectRings(result, candidate + [head], filteredHead, nextRemainingSideSums, nextHeadCandidates)
 
-def sumsForRing(ring):
-    return list(map(lambda i: ring[i-1][-2] + ring[(i+1) % HEXAGON_SIDES][1], range(HEXAGON_SIDES)))
+def innerRingSums(outerRingSums, ring):
+    return list(map(lambda i: outerRingSums[i] - ring[i-1][-2] - ring[(i+1) % HEXAGON_SIDES][1], range(HEXAGON_SIDES)))
 
 def rings(sideSums, candidates):
     result = []
@@ -54,7 +54,8 @@ def sideSize(cellCount):
     raise ValueError(f'Unable to find n satisfying 3*n*n-3*n+1=={cellCount}')
 
 def ringIndicesToLinear(ringList):
-    if len(ringList) == 1:
+    ringLen = len(ringList)
+    if ringLen == 1:
         return ringList
     # TODO: there must be a better way to do this!
     indicesForLength = {
@@ -62,9 +63,9 @@ def ringIndicesToLinear(ringList):
         19: [0,1,2,11,12,13,3,10,17,18,14,4,9,16,15,5,8,7,6],
         37: [0,1,2,3,17,18,19,20,4,16,29,30,31,21,5,15,18,35,36,32,22,6,14,27,34,33,23,7,13,26,25,24,8,12,11,10,9]
     }
-    if len(ringList) in indicesForLength:
-        return list(map(lambda i: ringList[i], indicesForLength[len(ringList)]))
-    raise ValueError(f'Unable to remap indices for list of size {len(ringList)}')
+    if ringLen in indicesForLength:
+        return list(map(lambda i: ringList[i], indicesForLength[ringLen]))
+    raise ValueError(f'Unable to remap indices for list of size {ringLen}')
 
 def collectResults(results, current, sums, possibleNumbers, sideSize):
     if sideSize == 1:
@@ -78,10 +79,9 @@ def collectResults(results, current, sums, possibleNumbers, sideSize):
     for ring in possibleRings:
         ringNumbers = set(sum(ring, []))
         innerRingPossibleNumbers = possibleNumbers - ringNumbers
-        ringSums = sumsForRing(ring)
-        innerRingSums = list(map(lambda i: sums[i] - ringSums[i], range(HEXAGON_SIDES)))
+        innerSums = innerRingSums(sums, ring)
 
-        collectResults(results, current + ringToList(ring), innerRingSums, innerRingPossibleNumbers, sideSize - 1)
+        collectResults(results, current + ringToList(ring), innerSums, innerRingPossibleNumbers, sideSize - 1)
 
 if __name__ == '__main__':
     SIDE_SIZE = 3 if len(sys.argv) == 1 else int(sys.argv[1])
