@@ -5,57 +5,57 @@ from main import *
 
 class MainTests(unittest.TestCase):
     def test_isRingBaseCompatible_first(self):
-        self.assertFalse(isRingBaseCompatible([1, 2, 3], [1, 3, 2]))
-        self.assertFalse(isRingBaseCompatible([1, 2, 3], [3, 1, 2]))
-        self.assertTrue(isRingBaseCompatible([1, 2, 3], [4, 5, 1]))
+        self.assertFalse(isRingBaseCompatible((1, 2, 3), (1, 3, 2)))
+        self.assertFalse(isRingBaseCompatible((1, 2, 3), (3, 1, 2)))
+        self.assertTrue(isRingBaseCompatible((1, 2, 3), (4, 5, 1)))
 
     def test_isRingBaseCompatible_last(self):
-        self.assertFalse(isRingBaseCompatible([1, 2, 3], [4, 3, 2]))
-        self.assertFalse(isRingBaseCompatible([1, 2, 3], [4, 5, 6, 3]))
-        self.assertFalse(isRingBaseCompatible([1, 2, 3], [4, 3, 6, 5]))
-        self.assertTrue(isRingBaseCompatible([1, 2, 3], [3, 4, 6, 5]))
+        self.assertFalse(isRingBaseCompatible((1, 2, 3), (4, 3, 2)))
+        self.assertFalse(isRingBaseCompatible((1, 2, 3), (4, 5, 6, 3)))
+        self.assertFalse(isRingBaseCompatible((1, 2, 3), (4, 3, 6, 5)))
+        self.assertTrue(isRingBaseCompatible((1, 2, 3), (3, 4, 6, 5)))
 
     def test_isRingBaseCompatible_middle(self):
-        self.assertFalse(isRingBaseCompatible([1, 2, 3], [2, 4, 5, 6]))
-        self.assertFalse(isRingBaseCompatible([1, 2, 3], [4, 5, 6, 2]))
-        self.assertFalse(isRingBaseCompatible([1, 2, 3], [4, 5, 2, 6]))
-        self.assertTrue(isRingBaseCompatible([1, 2, 3], [4, 5, 6]))
+        self.assertFalse(isRingBaseCompatible((1, 2, 3), (2, 4, 5, 6)))
+        self.assertFalse(isRingBaseCompatible((1, 2, 3), (4, 5, 6, 2)))
+        self.assertFalse(isRingBaseCompatible((1, 2, 3), (4, 5, 2, 6)))
+        self.assertTrue(isRingBaseCompatible((1, 2, 3), (4, 5, 6)))
 
     def test_isClosingRing(self):
-        self.assertTrue(isClosingRing([[1,2],[2,1]]))
-        self.assertTrue(isClosingRing([[1,2],[3,4],[2,1]]))
-        self.assertFalse(isClosingRing([[1,2],[2,3],[3,2]]))
-        self.assertFalse(isClosingRing([[1,2],[2,1],[3,2]]))
+        self.assertTrue(isClosingRing([(1,2),(2,1)]))
+        self.assertTrue(isClosingRing([(1,2),(3,4),(2,1)]))
+        self.assertFalse(isClosingRing([(1,2),(2,3),(3,2)]))
+        self.assertFalse(isClosingRing([(1,2),(2,1),(3,2)]))
 
     def test_isNextCandidate(self):
-        self.assertTrue(isNextCandidate([1, 2], 5, [2, 3]))
-        self.assertFalse(isNextCandidate([1, 2], 4, [2, 3]))
-        self.assertTrue(isNextCandidate([1, 2, 3], 6, [3, 2, 1]))
-        self.assertFalse(isNextCandidate([1, 2], 2, [1, 3]))
-        self.assertFalse(isNextCandidate([1, 2], 1, [3, 2]))
+        self.assertTrue(isNextCandidate((1, 2), 5, (2, 3)))
+        self.assertFalse(isNextCandidate((1, 2), 4, (2, 3)))
+        self.assertTrue(isNextCandidate((1, 2, 3), 6, (3, 2, 1)))
+        self.assertFalse(isNextCandidate((1, 2), 2, (1, 3)))
+        self.assertFalse(isNextCandidate((1, 2), 1, (3, 2)))
 
     def todo_collectRings(self):
         # TODO: how to test a recursive function
         pass
 
     def test_rings_notFound(self):
-        self.assertEqual(rings([3, 3, 3], [[1,2],[2,3]]), [])
+        self.assertEqual(rings([3, 3, 3], [(1,2),(2,3)]), [])
 
     def test_rings_found(self):
         self.assertEqual(rings([3, 5, 7, 9, 11, 7],
-                                    [[1,2],[2,3],[2,1],[3,1],[4,5],[3,4],[5,6],[6,1]]),
-                         [[[1,2],[2,3],[3,4],[4,5],[5,6],[6,1]]])
+                                    [(1,2),(2,3),(2,1),(3,1),(4,5),(3,4),(5,6),(6,1)]),
+                         [[(1,2),(2,3),(3,4),(4,5),(5,6),(6,1)]])
 
     def test_innerRingSums(self):
-        self.assertEqual(innerRingSums([38,38,38,38,38,38],[[1,2,3],[3,4,5],[5,6,7],[7,8,9],[9,10,11],[11,12,1]]),
+        self.assertEqual(innerRingSums([38,38,38,38,38,38],[(1,2,3),(3,4,5),(5,6,7),(7,8,9),(9,10,11),(11,12,1)]),
                           [38-12-4, 38-2-6, 38-4-8, 38-6-10, 38-8-12, 38-2-10])
-        self.assertEqual(innerRingSums([100,101,102,103,104,105],[[1,2,3,4],[4,5,6,7],[7,8,9,10],[10,11,12,13],[13,14,15,16],[16,17,18,1]]),
+        self.assertEqual(innerRingSums([100,101,102,103,104,105],[(1,2,3,4),(4,5,6,7),(7,8,9,10),(10,11,12,13),(13,14,15,16),(16,17,18,1)]),
                          [100-18-5,101-3-8,102-6-11,103-9-14,104-12-17,105-15-2])
 
     def test_ringToList(self):
-        self.assertEqual(ringToList([[1, 2, 3], [3, 4, 5], [5, 6, 1]]),
+        self.assertEqual(ringToList([(1, 2, 3), (3, 4, 5), (5, 6, 1)]),
                          [1, 2, 3, 4, 5, 6])
-        self.assertEqual(ringToList([[1,2],[2,3],[3,1]]),
+        self.assertEqual(ringToList([(1,2),(2,3),(3,1)]),
                          [1,2,3])
 
     def test_sideSize(self):
@@ -74,6 +74,12 @@ class MainTests(unittest.TestCase):
         self.assertEqual(ringIndicesToLinear([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36]),
                          [0,1,2,3,17,18,19,20,4,16,29,30,31,21,5,15,28,35,36,32,22,6,14,27,34,33,23,7,13,26,25,24,8,12,11,10,9])
         self.assertRaises(ValueError, ringIndicesToLinear, [1, 2])
+
+    def test_numbers(self):
+        self.assertEqual(numbers([(1,2),(2,3),(2,1),(3,1),(4,5),(3,4),(5,6),(6,1)]),
+                         {1,2,3,4,5,6})
+        self.assertEqual(numbers([(1,2,3),(3,4,5),(5,6,7),(7,8,9),(9,10,11),(11,12,1)]),
+                         {1,2,3,4,5,6,7,8,9,10,11,12})
 
 if __name__ == '__main__':
     unittest.main()

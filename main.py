@@ -44,7 +44,7 @@ def rings(sideSums, candidates):
     return result
 
 def ringToList(ring):
-    return sum(map(lambda l: l[0:-1], ring), [])
+    return sum(map(lambda l: list(l)[0:-1], ring), [])
 
 def sideSize(cellCount):
     countCells = lambda n: 3*n*n-3*n+1
@@ -67,6 +67,9 @@ def ringIndicesToLinear(ringList):
         return list(map(lambda i: ringList[i], indicesForLength[ringLen]))
     raise ValueError(f'Unable to remap indices for list of size {ringLen}')
 
+def numbers(ring):
+    return set(sum(map(list, ring), []))
+
 def collectResults(results, current, sums, possibleNumbers, sideSize):
     if sideSize == 1:
         # if we get here - possibleNumbers is a 1-element set
@@ -74,10 +77,10 @@ def collectResults(results, current, sums, possibleNumbers, sideSize):
         return
 
     possibleRings = rings(sums, list(filter(lambda x: sum(x) in sums,
-                                            map(list, itertools.permutations(possibleNumbers, sideSize)))))
+                                            itertools.permutations(possibleNumbers, sideSize))))
 
     for ring in possibleRings:
-        ringNumbers = set(sum(ring, []))
+        ringNumbers = numbers(ring)
         innerRingPossibleNumbers = possibleNumbers - ringNumbers
         innerSums = innerRingSums(sums, ring)
 
